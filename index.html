@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agricultura Inteligente - Plataforma Integrada</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    /* Custom animations & glow */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .animate-float {
+      animation: float 4s ease-in-out infinite;
+    }
+    .animate-pulse-ring {
+      animation: pulse-ring 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #06110a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #143522;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #1f5235;
+    }
+    /* Safe padding for bottom mobile nav */
+    .pb-mobile-nav {
+      padding-bottom: 5.5rem;
+    }
+    @media (min-width: 768px) {
+      .pb-mobile-nav {
+        padding-bottom: 2rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#050e09] text-gray-100 antialiased min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-black">
+
+  <!-- Toast Container for Notifications -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-3"></div>
+
+  <!-- ========================================== -->
+  <!-- 1. FLUXOS DE AUTENTICAÇÃO (LOGIN / CADASTRO) -->
+  <!-- Visível ao deslogar ou abrir o app           -->
+  <!-- ========================================== -->
+  <div id="authContainer" class="hidden min-h-screen w-full bg-gradient-to-b from-[#040c07] via-[#07170f] to-[#030906] flex items-center justify-center p-4 relative z-40">
+    <!-- Ambient glowing orbs -->
+    <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="w-full max-w-md bg-[#0a1b12] border border-emerald-800/60 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl">
+      
+      <!-- Back to Landing button when in sub-screens -->
+      <button id="authBackBtn" onclick="showAuthScreen('landing')" class="hidden mb-4 text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <span>Voltar à tela inicial</span>
+      </button>
+
+      <!-- AUTH SCREEN 1: Splash / Landing (Slide 1 & 2) -->
+      <div id="authLandingScreen" class="flex flex-col items-center text-center space-y-6">
+        <div class="w-20 h-20 rounded-2xl bg-gradient-to-tr from-emerald-600/30 to-emerald-400/20 border border-emerald-500/40 flex items-center justify-center shadow-lg shadow-emerald-500/10 animate-float">
+          <svg class="w-12 h-12 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.5 2 2 6.5 2 12c0 3.6 1.9 6.8 4.8 8.5L12 22l5.2-1.5C20.1 18.8 22 15.6 22 12c0-5.5-4.5-10-10-10zm-1.5 5.5c2.5 0 5 1.5 6 4.5-.5 3-3 5-6 5.5 1-2.5 1.5-4.5 0-7.5-.5-1-1-1.8-1.5-2.5h1.5z"/>
+          </svg>
+        </div>
+        
+        <div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-950 border border-emerald-700/60 text-emerald-400">
+            Boas-vindas ao Aplicativo
+          </span>
+          <h2 class="text-2xl font-bold text-white tracking-wide mt-3 uppercase">Agricultura Inteligente</h2>
+          <p class="text-sm text-gray-300 mt-1">Mais tecnologia, colheitas melhores.</p>
+        </div>
+
+        <div class="w-full space-y-3 pt-2">
+          <button onclick="showAuthScreen('login')" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-[#05130b] font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] text-sm flex items-center justify-center gap-2">
+            <span>Entrar com Conta Existente</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+          
+          <button onclick="showAuthScreen('register')" class="w-full py-3 bg-[#0d2217] hover:bg-[#122e20] text-emerald-300 font-medium rounded-xl border border-emerald-700/60 transition-all active:scale-[0.98] text-sm">
+            Criar Nova Conta
+          </button>
+
+          <button onclick="enterDirectlyAsGuest()" class="w-full py-2 text-xs text-gray-400 hover:text-emerald-400 transition-colors">
+            Acessar direto como Visitante (Demonstração) →
+          </button>
+        </div>
+      </div>
+
+      <!-- AUTH SCREEN 2: Login (Slide 3) -->
+      <div id="authLoginScreen" class="hidden flex flex-col space-y-5">
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-white">Acessando sua Conta</h3>
+          <p class="text-xs text-gray-400 mt-1">Para acessar, digite seu e-mail e senha cadastrados.</p>
+        </div>
+
+        <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-medium text-emerald-300 mb-1">E-mail</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-400 pointer-events-none">✉</span>
+              <input type="email" id="loginEmail" required value="joao.silva@fazenda.com" class="w-full pl-9 pr-3 py-2.5 bg-[#07160f] border border-emerald-800/80 rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400" placeholder="seu@email.com">
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-medium text-emerald-300">Senha</label>
+              <button type="button" onclick="showToast('Link de recuperação enviado para o e-mail!', 'info')" class="text-xs text-emerald-400 hover:underline">Esqueceu a senha?</button>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-400 pointer-events-none">🔒</span>
+              <input type="password" id="loginPassword" required value="12345678" class="w-full pl-9 pr-3 py-2.5 bg-[#07160f] border border-emerald-800/80 rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400" placeholder="••••••••">
+            </div>
+          </div>
+
+          <button type="submit" id="loginSubmitBtn" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-[#05130b] font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] text-sm flex items-center justify-center gap-2">
+            <span>Entrar no Aplicativo</span>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+          </button>
+        </form>
+
+        <div class="text-center text-xs text-gray-400">
+          Ainda não tem cadastro? 
+          <button onclick="showAuthScreen('register')" class="text-emerald-400 hover:underline font-semibold ml-1">Criar conta agora</button>
+        </div>
+      </div>
+
+      <!-- AUTH SCREEN 3: Register (Slide 4) -->
+      <div id="authRegisterScreen" class="hidden flex flex-col space-y-4">
+        <div class="text-center">
+          <h3 class="text-xl font-bold text-white">Cadastro de Novo Usuário</h3>
+          <p class="text-xs text-gray-400 mt-0.5">Preencha seus dados para criar seu acesso seguro.</p>
+        </div>
+
+        <form onsubmit="handleRegisterSubmit(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium text-emerald-300 mb-1">Nome Completo</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-400 pointer-events-none">👤</span>
+              <input type="text" id="regName" required placeholder="Ex: Carlos Eduardo Mendes" class="w-full pl-9 pr-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-emerald-300 mb-1">E-mail Profissional</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-emerald-400 pointer-events-none">✉</span>
+              <input type="email" id="regEmail" required placeholder="carlos@agro.com.br" class="w-full pl-9 pr-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-xs font-medium text-emerald-300 mb-1">Senha</label>
+              <input type="password" id="regPass" required placeholder="••••••••" class="w-full px-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-emerald-300 mb-1">Confirmar Senha</label>
+              <input type="password" id="regPassConfirm" required placeholder="••••••••" class="w-full px-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-sm text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-[#05130b] font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] text-sm mt-2">
+            Cadastrar
+          </button>
+        </form>
+
+        <div class="text-center text-xs text-gray-400">
+          Já tem conta? 
+          <button onclick="showAuthScreen('login')" class="text-emerald-400 hover:underline font-semibold ml-1">Fazer login</button>
+        </div>
+      </div>
+
+      <!-- AUTH SCREEN 4: Registration Success (Slide 5) -->
+      <div id="authSuccessScreen" class="hidden flex flex-col items-center text-center space-y-5 py-3">
+        <div class="w-20 h-20 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center text-emerald-400 shadow-xl shadow-emerald-500/20 animate-pulse-ring">
+          <svg class="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        </div>
+
+        <div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-emerald-950 border border-emerald-700/60 text-emerald-300">
+            Cadastro Concluído!
+          </span>
+          <h3 class="text-xl font-bold text-white mt-3">Cadastro realizado com sucesso!</h3>
+          <p class="text-sm text-gray-300 mt-1.5 max-w-xs">
+            Agora você já pode acessar a plataforma e monitorar sua propriedade em tempo real.
+          </p>
+        </div>
+
+        <button onclick="loginAfterRegistration()" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-[#05130b] font-bold rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98] text-sm flex items-center justify-center gap-2">
+          <span>Entrar no Aplicativo Agora</span>
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 2. APLICAÇÃO PRINCIPAL (DASHBOARD & TELAS) -->
+  <!-- ========================================== -->
+  <div id="mainApp" class="flex-1 flex flex-col min-h-screen">
+    
+    <!-- TOP HEADER -->
+    <header class="sticky top-0 z-30 bg-[#08170f]/95 border-b border-emerald-900/60 backdrop-blur-md px-4 sm:px-6 py-3 flex items-center justify-between">
+      
+      <!-- Brand & Property Selector -->
+      <div class="flex items-center space-x-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-[#05130b] shadow-md shadow-emerald-500/20">
+          <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+            <path d="M12 2C6.5 2 2 6.5 2 12c0 3.6 1.9 6.8 4.8 8.5L12 22l5.2-1.5C20.1 18.8 22 15.6 22 12c0-5.5-4.5-10-10-10zm-1.5 5.5c2.5 0 5 1.5 6 4.5-.5 3-3 5-6 5.5 1-2.5 1.5-4.5 0-7.5-.5-1-1-1.8-1.5-2.5h1.5z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-sm font-bold tracking-wider text-white uppercase">Agricultura Inteligente</h1>
+            <span class="hidden sm:inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">v2.4 Online</span>
+          </div>
+          <!-- Talhão / Fazenda Switcher -->
+          <div class="flex items-center gap-1.5 text-xs text-emerald-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <select id="talhaoSelector" onchange="changeTalhao(this.value)" class="bg-transparent text-xs text-emerald-300 font-medium focus:outline-none cursor-pointer">
+              <option value="todos" class="bg-[#091a12] text-white">Fazenda Primavera • Todos os Talhões</option>
+              <option value="t1" class="bg-[#091a12] text-white">Talhão 01 - Café Arábica (18 ha)</option>
+              <option value="t2" class="bg-[#091a12] text-white">Talhão 02 - Soja Ciclo Médio (45 ha)</option>
+              <option value="t3" class="bg-[#091a12] text-white">Talhão 03 - Milho Safrinha (22 ha)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Header Actions (Weather badge, Alerts & User Profile) -->
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        
+        <!-- Live Quick Weather pill (Desktop/Tablet) -->
+        <button onclick="navigateTo('clima')" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0e271a] border border-emerald-800/60 text-xs text-emerald-200 hover:border-emerald-500 transition-colors">
+          <span>🌧️ 15mm chuva</span>
+          <span class="text-gray-500">|</span>
+          <span>💨 18 km/h</span>
+        </button>
+
+        <!-- Notification Bell -->
+        <div class="relative">
+          <button onclick="toggleNotificationDropdown()" class="p-2 rounded-xl bg-[#0e271a] border border-emerald-800/60 text-emerald-300 hover:text-white hover:border-emerald-500 transition-colors relative">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <span id="notifBadge" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 text-[10px] font-bold text-black flex items-center justify-center">2</span>
+          </button>
+
+          <!-- Notification Dropdown -->
+          <div id="notifDropdown" class="hidden absolute right-0 mt-2 w-80 bg-[#0b1f14] border border-emerald-800/80 rounded-2xl shadow-2xl p-3 z-50">
+            <div class="flex items-center justify-between pb-2 border-b border-emerald-900/60 text-xs font-semibold text-emerald-300">
+              <span>Notificações da Lavoura</span>
+              <button onclick="clearNotifications()" class="text-[10px] text-gray-400 hover:text-white">Marcar lidas</button>
+            </div>
+            <div class="space-y-2 mt-2 max-h-60 overflow-y-auto">
+              <div class="p-2 rounded-lg bg-[#0e271a] border border-emerald-800/50 text-xs">
+                <span class="text-amber-400 font-semibold flex items-center gap-1">⚠️ Broca-do-café (Médio 22%)</span>
+                <p class="text-[11px] text-gray-300 mt-0.5">Monitore as armadilhas no Talhão Café A-01.</p>
+              </div>
+              <div class="p-2 rounded-lg bg-[#0e271a] border border-emerald-800/50 text-xs">
+                <span class="text-emerald-400 font-semibold flex items-center gap-1">🌧️ Previsão de Chuva (15mm)</span>
+                <p class="text-[11px] text-gray-300 mt-0.5">Janela favorável para adubação nos próximos 10 dias.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick "Nova Inspeção" button -->
+        <button onclick="openInspectionModal()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-[#05130b] font-bold text-xs shadow-md shadow-emerald-500/20 transition-transform active:scale-95">
+          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Nova Inspeção</span>
+        </button>
+
+        <!-- User Profile & Logout -->
+        <div class="flex items-center pl-1 sm:pl-2">
+          <button onclick="logoutToAuth()" title="Sair do painel e voltar ao login" class="flex items-center gap-2 px-2.5 py-1.5 rounded-xl bg-[#0e271a] hover:bg-rose-950/60 border border-emerald-800/60 hover:border-rose-600/60 text-xs text-gray-300 hover:text-rose-300 transition-colors">
+            <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-300 flex items-center justify-center font-bold text-xs">J</span>
+            <span class="hidden sm:inline font-medium">Sair</span>
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+          </button>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- MAIN BODY GRID (Sidebar for Desktop + Content Area) -->
+    <div class="flex-1 flex max-w-7xl w-full mx-auto pb-mobile-nav">
+      
+      <!-- DESKTOP SIDEBAR NAVIGATION -->
+      <aside class="hidden md:flex flex-col w-64 bg-[#07150e]/60 border-r border-emerald-900/50 p-4 space-y-6">
+        <div>
+          <span class="text-[11px] font-bold text-emerald-500 tracking-wider uppercase px-3">Módulos da Propriedade</span>
+          <nav class="mt-2 space-y-1">
+            
+            <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-500 text-[#05130b] shadow-md shadow-emerald-500/20 transition-all">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              <span>Visão Geral (Campos)</span>
+            </button>
+
+            <button onclick="navigateTo('clima')" id="nav-clima" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-gray-300 hover:text-white hover:bg-[#0e271a] transition-all">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+              <span>Monitoramento do Clima</span>
+            </button>
+
+            <button onclick="navigateTo('soloar')" id="nav-soloar" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-gray-300 hover:text-white hover:bg-[#0e271a] transition-all">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+              <span>Condições de Solo e Ar</span>
+            </button>
+
+            <button onclick="navigateTo('pragas')" id="nav-pragas" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-gray-300 hover:text-white hover:bg-[#0e271a] transition-all">
+              <svg class="w-4 h-4 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 2 1.88 1.88"/><path d="M14.12 3.88 16 2"/><path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6"/><path d="M12 20v-9"/><path d="M6.53 9C4.6 8.8 3 7.1 3 5"/><path d="M6 13H2"/><path d="M3 21c0-2.1 1.7-3.9 3.8-4"/><path d="M20.97 5c0 2.1-1.6 3.8-3.5 4"/><path d="M22 13h-4"/><path d="M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg>
+              <span>Análise de Risco de Pragas</span>
+            </button>
+
+            <button onclick="navigateTo('manejo')" id="nav-manejo" class="nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-gray-300 hover:text-white hover:bg-[#0e271a] transition-all">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <span>Sugestões de Manejo</span>
+            </button>
+
+          </nav>
+        </div>
+
+        <!-- Quick Summary Box -->
+        <div class="mt-auto bg-[#0a1c13] border border-emerald-900/60 rounded-2xl p-4 text-xs space-y-3">
+          <div class="flex items-center justify-between text-emerald-400 font-semibold">
+            <span>Sensores Ativos</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          </div>
+          <div class="space-y-1.5 text-gray-300">
+            <div class="flex justify-between">
+              <span class="text-gray-400">Online:</span>
+              <span class="font-bold text-emerald-300">11 de 12</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Bateria Média:</span>
+              <span class="font-bold text-white">88%</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-400">Sinal LoRaWAN:</span>
+              <span class="font-bold text-emerald-400">Excelente (-72dBm)</span>
+            </div>
+          </div>
+          <button onclick="showToast('Todos os sensores sincronizados com sucesso!', 'success')" class="w-full py-1.5 bg-[#102e1f] hover:bg-[#153b28] border border-emerald-700/60 text-emerald-300 rounded-lg text-[11px] font-medium transition-colors">
+            ↻ Sincronizar Sensores
+          </button>
+        </div>
+      </aside>
+
+      <!-- CONTENT PANELS -->
+      <main class="flex-1 p-4 sm:p-6 overflow-x-hidden">
+        
+        <!-- ========================================== -->
+        <!-- VIEW 1: PAINEL GERAL (CAMPOS - Slide 6)    -->
+        <!-- ========================================== -->
+        <div id="view-dashboard" class="space-y-6">
+          
+          <!-- Welcome Banner & Health Score -->
+          <div class="relative bg-gradient-to-r from-[#0c2619] via-[#091e14] to-[#06140e] border border-emerald-800/60 rounded-3xl p-5 sm:p-6 shadow-xl overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+            <div class="space-y-1.5 max-w-xl">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  Visão Geral da Propriedade
+                </span>
+                <span class="text-xs text-gray-400">Atualizado há 3 minutos</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-bold text-white">Saúde Geral da Lavoura em Nível Ótimo</h2>
+              <p class="text-xs sm:text-sm text-gray-300">
+                Após o login, você acompanha todas as informações integradas da sua fazenda: clima, sensores de solo, risco de pragas e recomendações de manejo.
+              </p>
+            </div>
+
+            <!-- Health Score Widget -->
+            <div class="flex items-center gap-4 bg-[#071810]/80 border border-emerald-700/40 px-5 py-3.5 rounded-2xl">
+              <div class="relative w-14 h-14 flex items-center justify-center">
+                <svg class="w-full h-full -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-emerald-950" stroke-width="3.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  <path class="text-emerald-400" stroke-width="3.5" stroke-dasharray="92, 100" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                </svg>
+                <span class="absolute text-sm font-extrabold text-white">92%</span>
+              </div>
+              <div>
+                <span class="text-xs text-emerald-400 font-semibold block">Índice Geral</span>
+                <span class="text-sm font-bold text-white">Lavoura Sadia</span>
+                <span class="text-[10px] text-gray-400 block">+4% vs. semana anterior</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4 Core Pillars Cards (Matching Slide 6 Layout) -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+                Campos • 4 Módulos Principais
+              </h3>
+              <span class="text-xs text-gray-400">Toque em qualquer card para ver detalhes</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <!-- Card 1: Clima -->
+              <div onclick="navigateTo('clima')" class="group cursor-pointer bg-[#0c2217] hover:bg-[#112d1f] border border-emerald-800/60 hover:border-emerald-500 rounded-2xl p-4 shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                    <span class="p-1.5 rounded-lg bg-emerald-500/20">🌧️</span>
+                    Clima
+                  </span>
+                  <span class="text-xs text-gray-400 group-hover:text-emerald-300">Abrir →</span>
+                </div>
+                <div class="space-y-1 mt-2">
+                  <div class="text-xs text-gray-300">
+                    Previsão: <span class="font-bold text-white">15mm</span>
+                  </div>
+                  <div class="text-xs text-gray-300">
+                    Vento: <span class="font-bold text-white">18km/h</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-emerald-400/90">
+                  <span>Próximas 24h</span>
+                  <span class="text-xs">💧 85% prob.</span>
+                </div>
+              </div>
+
+              <!-- Card 2: Solo e Ar -->
+              <div onclick="navigateTo('soloar')" class="group cursor-pointer bg-[#0c2217] hover:bg-[#112d1f] border border-emerald-800/60 hover:border-emerald-500 rounded-2xl p-4 shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                    <span class="p-1.5 rounded-lg bg-emerald-500/20">🌱</span>
+                    Solo e Ar
+                  </span>
+                  <span class="text-xs text-gray-400 group-hover:text-emerald-300">Abrir →</span>
+                </div>
+                <div class="space-y-1 mt-2">
+                  <div class="text-xs text-gray-300">
+                    Temp: <span class="font-bold text-white">23.8°C</span>
+                  </div>
+                  <div class="text-xs text-gray-300">
+                    Umidade: <span class="font-bold text-white">78%</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-emerald-400">
+                  <span>Solo: 65%</span>
+                  <span class="font-semibold text-emerald-300">Nível Ideal ✓</span>
+                </div>
+              </div>
+
+              <!-- Card 3: Risco de Pragas -->
+              <div onclick="navigateTo('pragas')" class="group cursor-pointer bg-[#0c2217] hover:bg-[#112d1f] border border-yellow-800/50 hover:border-yellow-500 rounded-2xl p-4 shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="flex items-center gap-2 text-xs font-bold text-yellow-400">
+                    <span class="p-1.5 rounded-lg bg-yellow-500/20">⚠️</span>
+                    Risco de Pragas
+                  </span>
+                  <span class="text-xs text-gray-400 group-hover:text-yellow-300">Abrir →</span>
+                </div>
+                <div class="space-y-1 mt-2">
+                  <div class="text-xs text-gray-300">
+                    Ferrugem: <span class="font-bold text-emerald-400">Baixo (5%)</span>
+                  </div>
+                  <div class="text-xs text-gray-300">
+                    Broca: <span class="font-bold text-yellow-400">Médio (22%)</span>
+                  </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-yellow-300">
+                  <span>Atenção Preventiva</span>
+                  <span>1 Alerta Ativo</span>
+                </div>
+              </div>
+
+              <!-- Card 4: Sugestões de Manejo -->
+              <div onclick="navigateTo('manejo')" class="group cursor-pointer bg-[#0c2217] hover:bg-[#112d1f] border border-emerald-800/60 hover:border-emerald-500 rounded-2xl p-4 shadow-lg transition-all duration-200 transform hover:-translate-y-1">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="flex items-center gap-2 text-xs font-bold text-emerald-400">
+                    <span class="p-1.5 rounded-lg bg-emerald-500/20">📋</span>
+                    Sugestões de Manejo
+                  </span>
+                  <span class="text-xs text-gray-400 group-hover:text-emerald-300">Abrir →</span>
+                </div>
+                <div class="space-y-1 mt-2">
+                  <div class="text-xs text-gray-300 font-semibold truncate">
+                    • Controle de Broca
+                  </div>
+                  <div class="text-xs text-gray-300 font-semibold truncate">
+                    • Próxima Adubação (10d)
+                  </div>
+                </div>
+                <div class="mt-3 pt-2.5 border-t border-emerald-900/50 flex items-center justify-between text-[11px] text-emerald-400">
+                  <span id="dashPendingManejo">2 Pendentes</span>
+                  <span class="font-semibold text-emerald-300">Checklist →</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Talhões Overview & Active Sensors Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Talhões Status List (2 cols) -->
+            <div class="lg:col-span-2 bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-sm font-bold text-white">Status por Talhão da Propriedade</h4>
+                  <p class="text-xs text-gray-400">Monitore umidade, risco e estágio de cada área</p>
+                </div>
+                <button onclick="openInspectionModal()" class="text-xs text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-1">
+                  + Nova Inspeção
+                </button>
+              </div>
+
+              <div class="space-y-3">
+                <!-- Talhão 1 -->
+                <div class="bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-700/60 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                      01
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold text-white">Talhão 01 - Café Arábica (18 ha)</h5>
+                      <span class="text-[11px] text-gray-300">Fase de Frutificação • Irrigação por Gotejamento</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs">
+                    <span class="px-2 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">Solo: 65% (Ideal)</span>
+                    <span class="px-2 py-1 rounded-lg bg-yellow-950/80 text-yellow-300 border border-yellow-700">Broca: 22%</span>
+                    <button onclick="navigateTo('pragas')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-black font-medium transition-colors">Ver</button>
+                  </div>
+                </div>
+
+                <!-- Talhão 2 -->
+                <div class="bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-700/60 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                      02
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold text-white">Talhão 02 - Soja Ciclo Médio (45 ha)</h5>
+                      <span class="text-[11px] text-gray-300">Fase Vegetativa R1 • Pivô Central</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs">
+                    <span class="px-2 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">Solo: 62% (Ideal)</span>
+                    <span class="px-2 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">Ferrugem: 5%</span>
+                    <button onclick="navigateTo('soloar')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-black font-medium transition-colors">Ver</button>
+                  </div>
+                </div>
+
+                <!-- Talhão 3 -->
+                <div class="bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-700/60 flex items-center justify-center text-emerald-400 font-bold text-sm">
+                      03
+                    </div>
+                    <div>
+                      <h5 class="text-xs font-bold text-white">Talhão 03 - Milho Safrinha (22 ha)</h5>
+                      <span class="text-[11px] text-gray-300">Fase de Emergência V3 • Sequeiro</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs">
+                    <span class="px-2 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">Solo: 68% (Ótimo)</span>
+                    <span class="px-2 py-1 rounded-lg bg-emerald-950 text-emerald-300 border border-emerald-800">Lagarta: 8%</span>
+                    <button onclick="navigateTo('clima')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-black font-medium transition-colors">Ver</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Field Inspection Logs (1 col) -->
+            <div class="bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="text-sm font-bold text-white">Últimas Inspeções</h4>
+                  <span class="text-[11px] text-emerald-400">Tempo Real</span>
+                </div>
+                <div id="recentInspectionList" class="space-y-2.5 text-xs">
+                  <!-- Dynamically populated or static baseline -->
+                  <div class="p-2.5 rounded-xl bg-[#0e271a] border border-emerald-800/50">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-emerald-300">Talhão 01 - Café</span>
+                      <span class="text-[10px] text-gray-400">Hoje, 09:15</span>
+                    </div>
+                    <p class="text-[11px] text-gray-300 mt-1">Armadilhas de broca revisadas. Presença moderada no quadrante sul.</p>
+                  </div>
+                  <div class="p-2.5 rounded-xl bg-[#0e271a] border border-emerald-800/50">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-emerald-300">Talhão 02 - Soja</span>
+                      <span class="text-[10px] text-gray-400">Ontem, 16:30</span>
+                    </div>
+                    <p class="text-[11px] text-gray-300 mt-1">Nenhuma incidência de ferrugem asiática detectada.</p>
+                  </div>
+                </div>
+              </div>
+
+              <button onclick="openInspectionModal()" class="w-full mt-4 py-2 bg-[#123322] hover:bg-[#18452d] border border-emerald-700/60 text-emerald-300 rounded-xl text-xs font-semibold transition-colors flex items-center justify-center gap-1.5">
+                <span>Registrar Inspeção de Campo</span>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 2: CLIMA & PREVISÃO (Slide 7 expandido)-->
+        <!-- ========================================== -->
+        <div id="view-clima" class="hidden space-y-6">
+          
+          <!-- Clima Header Banner -->
+          <div class="bg-gradient-to-r from-[#0a2317] to-[#06140e] border border-emerald-800/60 rounded-3xl p-5 sm:p-6 shadow-xl">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  Monitoramento do Clima • Slide 7
+                </span>
+                <h2 class="text-2xl font-bold text-white mt-1">Previsão e Condições Meteorológicas</h2>
+                <p class="text-xs sm:text-sm text-gray-300 mt-0.5">
+                  No item Clima, você encontra a previsão de chuvas para as próximas 24 horas e a velocidade do vento para planejar suas atividades com máxima precisão.
+                </p>
+              </div>
+
+              <!-- Main Current Weather Box -->
+              <div class="flex items-center gap-4 bg-[#0d271b] border border-emerald-700/50 rounded-2xl p-4">
+                <div class="text-3xl">🌧️</div>
+                <div>
+                  <div class="text-xs text-gray-400">Previsão 24h</div>
+                  <div class="text-2xl font-black text-white">15 mm</div>
+                  <div class="text-xs text-emerald-400 font-medium">Vento: 18 km/h (SE)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hourly Forecast (Próximas 24 Horas) -->
+          <div class="bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>⏱️</span>
+                Previsão Detalhada Hora a Hora (Próximas 24 Horas)
+              </h3>
+              <span class="text-xs text-emerald-400">Chuva prevista a partir das 14h</span>
+            </div>
+
+            <!-- Scrollable Hourly Cards -->
+            <div class="flex gap-3 overflow-x-auto pb-2 pt-1">
+              <div class="flex-shrink-0 w-24 bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3 text-center">
+                <span class="text-xs text-gray-400 font-mono">Agora</span>
+                <div class="text-xl my-1.5">⛅</div>
+                <div class="text-sm font-bold text-white">23.8°C</div>
+                <div class="text-[10px] text-gray-400 mt-1">0 mm • 10%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3 text-center">
+                <span class="text-xs text-gray-400 font-mono">13:00</span>
+                <div class="text-xl my-1.5">☁️</div>
+                <div class="text-sm font-bold text-white">24.5°C</div>
+                <div class="text-[10px] text-gray-400 mt-1">0 mm • 25%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#143322] border border-emerald-500/70 rounded-2xl p-3 text-center ring-1 ring-emerald-500/30">
+                <span class="text-xs text-emerald-300 font-bold font-mono">14:00</span>
+                <div class="text-xl my-1.5">🌧️</div>
+                <div class="text-sm font-bold text-white">22.0°C</div>
+                <div class="text-[10px] text-emerald-400 font-bold mt-1">4 mm • 80%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#143322] border border-emerald-500/70 rounded-2xl p-3 text-center">
+                <span class="text-xs text-emerald-300 font-bold font-mono">15:00</span>
+                <div class="text-xl my-1.5">🌧️</div>
+                <div class="text-sm font-bold text-white">21.2°C</div>
+                <div class="text-[10px] text-emerald-400 font-bold mt-1">6 mm • 90%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3 text-center">
+                <span class="text-xs text-gray-400 font-mono">16:00</span>
+                <div class="text-xl my-1.5">🌦️</div>
+                <div class="text-sm font-bold text-white">21.0°C</div>
+                <div class="text-[10px] text-gray-400 mt-1">3 mm • 65%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3 text-center">
+                <span class="text-xs text-gray-400 font-mono">17:00</span>
+                <div class="text-xl my-1.5">🌦️</div>
+                <div class="text-sm font-bold text-white">20.5°C</div>
+                <div class="text-[10px] text-gray-400 mt-1">2 mm • 40%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3 text-center">
+                <span class="text-xs text-gray-400 font-mono">18:00</span>
+                <div class="text-xl my-1.5">☁️</div>
+                <div class="text-sm font-bold text-white">19.8°C</div>
+                <div class="text-[10px] text-gray-400 mt-1">0 mm • 20%</div>
+              </div>
+
+              <div class="flex-shrink-0 w-24 bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-3 text-center">
+                <span class="text-xs text-gray-400 font-mono">Noite</span>
+                <div class="text-xl my-1.5">🌙</div>
+                <div class="text-sm font-bold text-white">18.5°C</div>
+                <div class="text-[10px] text-gray-400 mt-1">0 mm • 10%</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 7-Day Weekly Forecast & Agronomic Advice -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- 7-Day List (2 cols) -->
+            <div class="lg:col-span-2 bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg space-y-3">
+              <h3 class="text-sm font-bold text-white">Previsão Semanal (7 Dias)</h3>
+              <div class="space-y-2">
+                
+                <div class="p-3 rounded-xl bg-[#0e271a] border border-emerald-800/50 flex items-center justify-between text-xs">
+                  <span class="w-24 font-bold text-white">Hoje</span>
+                  <div class="flex items-center gap-2">
+                    <span>🌧️</span>
+                    <span class="text-gray-300">Chuva moderada (15mm)</span>
+                  </div>
+                  <span class="text-gray-400">18°C / 25°C</span>
+                  <span class="text-emerald-400 font-mono">85% prob.</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-[#0e271a] border border-emerald-800/50 flex items-center justify-between text-xs">
+                  <span class="w-24 font-bold text-white">Terça-feira</span>
+                  <div class="flex items-center gap-2">
+                    <span>🌦️</span>
+                    <span class="text-gray-300">Pancadas rápidas (5mm)</span>
+                  </div>
+                  <span class="text-gray-400">17°C / 26°C</span>
+                  <span class="text-emerald-400 font-mono">45% prob.</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-[#0e271a] border border-emerald-800/50 flex items-center justify-between text-xs">
+                  <span class="w-24 font-bold text-white">Quarta-feira</span>
+                  <div class="flex items-center gap-2">
+                    <span>☀️</span>
+                    <span class="text-gray-300">Ensolarado • Sem chuva</span>
+                  </div>
+                  <span class="text-gray-400">16°C / 28°C</span>
+                  <span class="text-gray-500 font-mono">5% prob.</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-[#0e271a] border border-emerald-800/50 flex items-center justify-between text-xs">
+                  <span class="w-24 font-bold text-white">Quinta-feira</span>
+                  <div class="flex items-center gap-2">
+                    <span>🌤️</span>
+                    <span class="text-gray-300">Parcialmente Nublado</span>
+                  </div>
+                  <span class="text-gray-400">17°C / 27°C</span>
+                  <span class="text-gray-500 font-mono">10% prob.</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-[#0e271a] border border-emerald-800/50 flex items-center justify-between text-xs">
+                  <span class="w-24 font-bold text-white">Sexta-feira</span>
+                  <div class="flex items-center gap-2">
+                    <span>🌧️</span>
+                    <span class="text-gray-300">Chuva esperada (12mm)</span>
+                  </div>
+                  <span class="text-gray-400">18°C / 24°C</span>
+                  <span class="text-emerald-400 font-mono">75% prob.</span>
+                </div>
+
+                <div class="p-3 rounded-xl bg-[#0e271a] border border-emerald-800/50 flex items-center justify-between text-xs">
+                  <span class="w-24 font-bold text-white">Sábado / Dom</span>
+                  <div class="flex items-center gap-2">
+                    <span>⛅</span>
+                    <span class="text-gray-300">Tempo estável</span>
+                  </div>
+                  <span class="text-gray-400">16°C / 26°C</span>
+                  <span class="text-gray-500 font-mono">15% prob.</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- Agronomic Recommendation for Field Work -->
+            <div class="bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg space-y-4">
+              <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                <span>💡</span>
+                Janelas Operacionais da Lavoura
+              </h3>
+
+              <div class="p-3 rounded-2xl bg-[#0e271a] border border-emerald-800/60 space-y-1.5 text-xs">
+                <span class="font-bold text-emerald-400">Pulverização e Aplicação:</span>
+                <p class="text-gray-300">
+                  <strong class="text-white">Janela Ideal:</strong> Quarta-feira entre 06:00 e 10:30 (Vento < 10 km/h e sem chuva prevista).
+                </p>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-[#0e271a] border border-emerald-800/60 space-y-1.5 text-xs">
+                <span class="font-bold text-emerald-400">Adubação de Cobertura:</span>
+                <p class="text-gray-300">
+                  <strong class="text-white">Janela Ideal:</strong> Sexta-feira antes da chuva de 12mm para máxima absorção dos nutrientes pelo solo.
+                </p>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-[#0e271a] border border-emerald-800/60 space-y-1.5 text-xs">
+                <span class="font-bold text-emerald-400">Irrigação:</span>
+                <p class="text-gray-300">
+                  Desnecessária nos próximos 2 dias devido ao acúmulo de 15mm de hoje. Economia de energia garantida.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 3: SOLO E AR (Slide 8 expandido)      -->
+        <!-- ========================================== -->
+        <div id="view-soloar" class="hidden space-y-6">
+          
+          <div class="bg-gradient-to-r from-[#0a2317] to-[#06140e] border border-emerald-800/60 rounded-3xl p-5 sm:p-6 shadow-xl">
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              Condições de Solo e Ar • Slide 8
+            </span>
+            <h2 class="text-2xl font-bold text-white mt-1">Monitoramento Físico e Hídrico da Lavoura</h2>
+            <p class="text-xs sm:text-sm text-gray-300 mt-0.5">
+              Em Solo e Ar, você acompanha a temperatura, a umidade do ar e a umidade do solo. Esses dados são fundamentais para identificar o melhor momento de irrigação e garantir alta produtividade.
+            </p>
+          </div>
+
+          <!-- Gauges Grid (Temp, Umidade Ar, Umidade Solo) -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- Gauge 1: Temperatura -->
+            <div class="bg-[#0a1c13] border border-emerald-800/60 rounded-3xl p-5 shadow-lg space-y-4">
+              <div class="flex items-center justify-between text-xs text-gray-400">
+                <span class="font-bold text-white flex items-center gap-1.5">🌡️ Temperatura do Ar</span>
+                <span>Sensor Estação</span>
+              </div>
+
+              <div class="text-center py-2">
+                <div class="text-4xl font-extrabold text-white">23.8 <span class="text-xl font-normal text-emerald-400">°C</span></div>
+                <span class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-700">Faixa Térmica Ideal</span>
+              </div>
+
+              <div class="border-t border-emerald-900/60 pt-3 text-xs space-y-1 text-gray-300">
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Mínima registrada hoje:</span>
+                  <span class="font-semibold text-white">18.2 °C</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Máxima prevista:</span>
+                  <span class="font-semibold text-white">26.5 °C</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gauge 2: Umidade do Ar -->
+            <div class="bg-[#0a1c13] border border-emerald-800/60 rounded-3xl p-5 shadow-lg space-y-4">
+              <div class="flex items-center justify-between text-xs text-gray-400">
+                <span class="font-bold text-white flex items-center gap-1.5">💨 Umidade do Ar</span>
+                <span>Higrômetro</span>
+              </div>
+
+              <div class="text-center py-2">
+                <div class="text-4xl font-extrabold text-white">78 <span class="text-xl font-normal text-emerald-400">%</span></div>
+                <div class="w-full bg-[#06120b] h-2 rounded-full mt-3 overflow-hidden">
+                  <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full" style="width: 78%"></div>
+                </div>
+              </div>
+
+              <div class="border-t border-emerald-900/60 pt-3 text-xs space-y-1 text-gray-300">
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Ponto de orvalho:</span>
+                  <span class="font-semibold text-white">19.4 °C</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Déficit de pressão de vapor (VPD):</span>
+                  <span class="font-semibold text-emerald-400">0.82 kPa (Ótimo)</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gauge 3: Umidade do Solo (Destaque Slide 8) -->
+            <div class="bg-[#0a1c13] border-2 border-emerald-500/70 rounded-3xl p-5 shadow-xl space-y-4 relative ring-2 ring-emerald-500/20">
+              <div class="flex items-center justify-between text-xs text-gray-400">
+                <span class="font-bold text-emerald-300 flex items-center gap-1.5">🌱 Umidade do Solo</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500 text-black font-bold text-[10px]">DESTAQUE</span>
+              </div>
+
+              <div class="text-center py-2">
+                <div class="text-4xl font-black text-emerald-400">65 <span class="text-xl font-normal text-white">%</span></div>
+                <div class="text-xs font-bold text-emerald-300 mt-1">✓ Nível Ideal para Lavoura</div>
+                
+                <div class="w-full bg-[#06120b] h-2.5 rounded-full mt-2 overflow-hidden relative">
+                  <div class="bg-gradient-to-r from-emerald-400 to-teal-300 h-full rounded-full" style="width: 65%"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-gray-400 mt-1">
+                  <span>Seco (&lt;40%)</span>
+                  <span class="text-emerald-400 font-bold">Ideal (55-75%)</span>
+                  <span>Encharcado (&gt;80%)</span>
+                </div>
+              </div>
+
+              <div class="border-t border-emerald-900/60 pt-3 text-xs space-y-1 text-gray-300">
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Status do Pivô:</span>
+                  <span class="font-semibold text-emerald-300">Desligado (Economia)</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-400">Próxima irrigação estimada:</span>
+                  <span class="font-semibold text-white">Em 48 horas</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Multi-depth Soil Sensor Probe Visualizer -->
+          <div class="bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-bold text-white">Sonda de Solo em Múltiplas Profundidades</h3>
+                <p class="text-xs text-gray-400">Sensores capacitivos instalados na zona radicular do Talhão 01</p>
+              </div>
+              <button onclick="simulateIrrigationTest()" class="px-3 py-1.5 rounded-xl bg-emerald-500/20 hover:bg-emerald-500 hover:text-black border border-emerald-500/40 text-emerald-300 text-xs font-bold transition-all">
+                Simular Início de Irrigação
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="p-3.5 rounded-2xl bg-[#0e271a] border border-emerald-800/60">
+                <div class="flex justify-between text-xs font-bold text-white">
+                  <span>Camada Superficial (20 cm)</span>
+                  <span id="depth20Val" class="text-emerald-400">65%</span>
+                </div>
+                <p class="text-[11px] text-gray-300 mt-1">Atividade radicular fina. Umidade ideal.</p>
+                <div class="w-full bg-[#06120b] h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div id="depth20Bar" class="bg-emerald-400 h-full rounded-full" style="width: 65%"></div>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-[#0e271a] border border-emerald-800/60">
+                <div class="flex justify-between text-xs font-bold text-white">
+                  <span>Camada Média (40 cm)</span>
+                  <span id="depth40Val" class="text-emerald-400">68%</span>
+                </div>
+                <p class="text-[11px] text-gray-300 mt-1">Reserva hídrica principal da cultura.</p>
+                <div class="w-full bg-[#06120b] h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div id="depth40Bar" class="bg-emerald-400 h-full rounded-full" style="width: 68%"></div>
+                </div>
+              </div>
+
+              <div class="p-3.5 rounded-2xl bg-[#0e271a] border border-emerald-800/60">
+                <div class="flex justify-between text-xs font-bold text-white">
+                  <span>Camada Profunda (60 cm)</span>
+                  <span id="depth60Val" class="text-emerald-400">72%</span>
+                </div>
+                <p class="text-[11px] text-gray-300 mt-1">Lençol capilar estável sem lixiviação.</p>
+                <div class="w-full bg-[#06120b] h-1.5 rounded-full mt-2 overflow-hidden">
+                  <div id="depth60Bar" class="bg-emerald-400 h-full rounded-full" style="width: 72%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 4: RISCO DE PRAGAS (Slide 9 expandido)-->
+        <!-- ========================================== -->
+        <div id="view-pragas" class="hidden space-y-6">
+          
+          <div class="bg-gradient-to-r from-[#0a2317] to-[#06140e] border border-emerald-800/60 rounded-3xl p-5 sm:p-6 shadow-xl">
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/40">
+              Análise de Risco de Pragas • Slide 9
+            </span>
+            <h2 class="text-2xl font-bold text-white mt-1">Predição e Manejo Integrado de Pragas</h2>
+            <p class="text-xs sm:text-sm text-gray-300 mt-0.5">
+              O aplicativo analisa as condições climáticas e do solo para indicar a probabilidade de ocorrência de pragas, como a ferrugem e a broca-do-café, permitindo ações preventivas e reduzindo prejuízos.
+            </p>
+          </div>
+
+          <!-- Highlight Cards matching Slide 9 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            
+            <!-- Card 1: Ferrugem (Slide 9: BAIXO 5%) -->
+            <div class="bg-[#0a1c13] border border-emerald-700/60 rounded-3xl p-6 shadow-lg space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-base font-bold text-white">Risco de Ferrugem</h3>
+                  <p class="text-xs text-gray-400">Hemileia vastatrix (Café) / Phakopsora pachyrhizi (Soja)</p>
+                </div>
+                <span class="text-xs font-black px-3 py-1 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-700">
+                  BAIXO (5%)
+                </span>
+              </div>
+
+              <div class="w-full bg-[#06120b] h-2.5 rounded-full overflow-hidden">
+                <div class="bg-emerald-400 h-full rounded-full" style="width: 5%"></div>
+              </div>
+
+              <div class="bg-[#0e271a] p-3 rounded-2xl text-xs space-y-1.5 text-gray-300">
+                <div class="font-semibold text-emerald-300">Diagnóstico Inteligente:</div>
+                <p>
+                  As temperaturas recentes e a umidade foliar atual não favorecem a esporulação do fungo nos talhões monitorados.
+                </p>
+                <div class="text-[11px] text-gray-400 pt-1 border-t border-emerald-900/60">
+                  Recomendação: Manter monitoramento visual de rotina a cada 15 dias.
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Broca-do-café (Slide 9: MÉDIO 22%) -->
+            <div class="bg-[#141b11] border-2 border-yellow-600/70 rounded-3xl p-6 shadow-xl space-y-4 ring-2 ring-yellow-500/20">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="text-base font-bold text-white flex items-center gap-1.5">
+                    <span>⚠️</span>
+                    Risco da Broca-do-café
+                  </h3>
+                  <p class="text-xs text-yellow-300/80">Hypothenemus hampei (Talhão Café A-01)</p>
+                </div>
+                <span class="text-xs font-black px-3 py-1 rounded-lg bg-yellow-950 text-yellow-400 border border-yellow-700 animate-pulse">
+                  MÉDIO (22%)
+                </span>
+              </div>
+
+              <div class="w-full bg-[#06120b] h-2.5 rounded-full overflow-hidden">
+                <div class="bg-yellow-400 h-full rounded-full" style="width: 22%"></div>
+              </div>
+
+              <div class="bg-[#1a2315] p-3 rounded-2xl text-xs space-y-1.5 text-gray-200">
+                <div class="font-semibold text-yellow-300">Alerta Preventivo do Sistema:</div>
+                <p>
+                  A combinação de temperatura média de 23.8°C com a fase de frutos verdes cria condições propícias para o voo dos adultos.
+                </p>
+                <div class="text-[11px] text-yellow-400 pt-1 border-t border-yellow-900/60 flex items-center justify-between">
+                  <span>Ação: Iniciar monitoramento de armadilhas.</span>
+                  <button onclick="navigateTo('manejo')" class="underline font-bold hover:text-white">Ver Manejo →</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Extended Pest Catalog & Field Inspection Log -->
+          <div class="bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 shadow-lg space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h3 class="text-sm font-bold text-white">Rastreamento Sanitário da Propriedade</h3>
+                <p class="text-xs text-gray-400">Cruzamento de armadilhas e histórico das vistorias técnicas</p>
+              </div>
+              <button onclick="openInspectionModal()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-black font-bold rounded-xl text-xs shadow-md transition-all">
+                + Nova Inspeção de Pragas
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div class="p-3 rounded-2xl bg-[#0e271a] border border-emerald-800/60">
+                <div class="flex justify-between font-bold text-white">
+                  <span>Lagarta-do-cartucho</span>
+                  <span class="text-emerald-400 font-mono">8% (Baixo)</span>
+                </div>
+                <span class="text-[10px] text-gray-400">Talhão 03 - Milho</span>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-[#0e271a] border border-emerald-800/60">
+                <div class="flex justify-between font-bold text-white">
+                  <span>Bicho-mineiro</span>
+                  <span class="text-emerald-400 font-mono">4% (Baixo)</span>
+                </div>
+                <span class="text-[10px] text-gray-400">Talhão 01 - Café</span>
+              </div>
+
+              <div class="p-3 rounded-2xl bg-[#0e271a] border border-emerald-800/60">
+                <div class="flex justify-between font-bold text-white">
+                  <span>Percevejo-marrom</span>
+                  <span class="text-emerald-400 font-mono">6% (Baixo)</span>
+                </div>
+                <span class="text-[10px] text-gray-400">Talhão 02 - Soja</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ========================================== -->
+        <!-- VIEW 5: SUGESTÕES DE MANEJO (Slide 10)     -->
+        <!-- ========================================== -->
+        <div id="view-manejo" class="hidden space-y-6">
+          
+          <div class="bg-gradient-to-r from-[#0a2317] to-[#06140e] border border-emerald-800/60 rounded-3xl p-5 sm:p-6 shadow-xl">
+            <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+              Sugestões de Manejo • Slide 10
+            </span>
+            <h2 class="text-2xl font-bold text-white mt-1">Recomendações Agronômicas Personalizadas</h2>
+            <p class="text-xs sm:text-sm text-gray-300 mt-0.5">
+              Receba orientações customizadas, como o monitoramento de armadilhas e a data ideal para a próxima adubação, ajudando você a tomar decisões mais seguras e eficientes.
+            </p>
+          </div>
+
+          <!-- Manejo Progress & Interactive Checklist -->
+          <div class="bg-[#0a1c13] border border-emerald-800/50 rounded-3xl p-5 sm:p-6 shadow-lg space-y-5">
+            
+            <!-- Progress Status Bar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-emerald-900/60">
+              <div>
+                <h3 class="text-sm font-bold text-white">Tarefas de Manejo da Semana</h3>
+                <p class="text-xs text-gray-400">Marque as atividades concluídas para atualizar o painel</p>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="flex items-center gap-3">
+                <div class="text-right">
+                  <span id="manejoProgressText" class="text-xs font-bold text-emerald-400">2 de 4 concluídas (50%)</span>
+                </div>
+                <div class="w-32 bg-[#06120b] h-2.5 rounded-full overflow-hidden border border-emerald-900">
+                  <div id="manejoProgressBar" class="bg-emerald-400 h-full rounded-full transition-all duration-300" style="width: 50%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Task Filters -->
+            <div class="flex items-center gap-2 text-xs">
+              <button onclick="filterManejoTasks('todas')" id="filter-todas" class="px-3 py-1 rounded-lg bg-emerald-500 text-black font-bold">Todas</button>
+              <button onclick="filterManejoTasks('pendentes')" id="filter-pendentes" class="px-3 py-1 rounded-lg bg-[#0e271a] text-gray-300 hover:text-white border border-emerald-800/50">Pendentes</button>
+              <button onclick="filterManejoTasks('concluidas')" id="filter-concluidas" class="px-3 py-1 rounded-lg bg-[#0e271a] text-gray-300 hover:text-white border border-emerald-800/50">Concluídas</button>
+            </div>
+
+            <!-- Interactive Task List Items -->
+            <div id="manejoTaskList" class="space-y-3">
+              
+              <!-- Task 1 (Slide 10: Controle de Broca) -->
+              <div class="task-card bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-4 transition-all" data-status="pending" id="task-1">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" onchange="toggleTask(1)" id="task-chk-1" class="w-5 h-5 mt-0.5 rounded-lg text-emerald-500 bg-[#06120b] border-emerald-700 focus:ring-emerald-400 cursor-pointer">
+                    <div>
+                      <h4 id="task-title-1" class="text-sm font-bold text-white flex items-center gap-2">
+                        <span>🦗 Controle de Broca</span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-yellow-950 text-yellow-300 border border-yellow-700">Prioridade Alta</span>
+                      </h4>
+                      <p class="text-xs text-gray-300 mt-1">
+                        Iniciar monitoramento das 12 armadilhas com atraente alcoólico instaladas no Talhão Café A-01.
+                      </p>
+                      <div class="flex items-center gap-3 text-[11px] text-emerald-400/90 mt-2">
+                        <span>📅 Prazo: Imediato (Próximas 48h)</span>
+                        <span>• Talhão 01</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span id="task-badge-1" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-yellow-950/80 text-yellow-300 border border-yellow-700">Pendente</span>
+                </div>
+              </div>
+
+              <!-- Task 2 (Slide 10: Próxima Adubação) -->
+              <div class="task-card bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-4 transition-all" data-status="pending" id="task-2">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" onchange="toggleTask(2)" id="task-chk-2" class="w-5 h-5 mt-0.5 rounded-lg text-emerald-500 bg-[#06120b] border-emerald-700 focus:ring-emerald-400 cursor-pointer">
+                    <div>
+                      <h4 id="task-title-2" class="text-sm font-bold text-white flex items-center gap-2">
+                        <span>📅 Próxima Adubação</span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700">Programada</span>
+                      </h4>
+                      <p class="text-xs text-gray-300 mt-1">
+                        Programar aplicação de cobertura NPK nos próximos <strong class="text-emerald-400">10 dias</strong>, aproveitando as janelas favoráveis de chuva para rápida solubilização.
+                      </p>
+                      <div class="flex items-center gap-3 text-[11px] text-emerald-400/90 mt-2">
+                        <span>📅 Prazo: Próximos 10 dias</span>
+                        <span>• Todos os Talhões</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span id="task-badge-2" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-yellow-950/80 text-yellow-300 border border-yellow-700">Pendente</span>
+                </div>
+              </div>
+
+              <!-- Task 3: Concluída -->
+              <div class="task-card bg-[#091b12] border border-emerald-900/40 rounded-2xl p-4 transition-all opacity-85" data-status="completed" id="task-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" checked onchange="toggleTask(3)" id="task-chk-3" class="w-5 h-5 mt-0.5 rounded-lg text-emerald-500 bg-[#06120b] border-emerald-700 focus:ring-emerald-400 cursor-pointer">
+                    <div>
+                      <h4 id="task-title-3" class="text-sm font-bold text-gray-300 line-through flex items-center gap-2">
+                        <span>📡 Calibração das Sondas de Solo</span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300">Concluído</span>
+                      </h4>
+                      <p class="text-xs text-gray-400 mt-1">
+                        Verificação da leitura e transmissão de telemetria das sondas capacitivas no Talhão 02.
+                      </p>
+                      <div class="flex items-center gap-3 text-[11px] text-gray-500 mt-2">
+                        <span>✓ Concluído ontem por João Silva</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span id="task-badge-3" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800">Concluído</span>
+                </div>
+              </div>
+
+              <!-- Task 4: Concluída -->
+              <div class="task-card bg-[#091b12] border border-emerald-900/40 rounded-2xl p-4 transition-all opacity-85" data-status="completed" id="task-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" checked onchange="toggleTask(4)" id="task-chk-4" class="w-5 h-5 mt-0.5 rounded-lg text-emerald-500 bg-[#06120b] border-emerald-700 focus:ring-emerald-400 cursor-pointer">
+                    <div>
+                      <h4 id="task-title-4" class="text-sm font-bold text-gray-300 line-through flex items-center gap-2">
+                        <span>🔍 Inspeção Visual de Ferrugem</span>
+                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300">Concluído</span>
+                      </h4>
+                      <p class="text-xs text-gray-400 mt-1">
+                        Amostragem em ziguezague de 50 folhas nos talhões de café e soja. Risco confirmado em 5%.
+                      </p>
+                      <div class="flex items-center gap-3 text-[11px] text-gray-500 mt-2">
+                        <span>✓ Concluído há 2 dias</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span id="task-badge-4" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800">Concluído</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Add Custom Manejo Task Form -->
+            <div class="pt-2">
+              <form onsubmit="addNewManejoTask(event)" class="flex flex-col sm:flex-row gap-2">
+                <input type="text" id="newTaskInput" placeholder="Ex: Limpeza e manutenção das válvulas do gotejamento..." required class="flex-1 px-4 py-2.5 bg-[#06140d] border border-emerald-800/80 rounded-xl text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400">
+                <button type="submit" class="px-5 py-2.5 bg-[#123322] hover:bg-emerald-500 hover:text-black border border-emerald-700/60 text-emerald-300 font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5">
+                  <span>+ Adicionar Atividade</span>
+                </button>
+              </form>
+            </div>
+
+          </div>
+
+        </div>
+
+      </main>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- 3. BOTTOM MOBILE NAVIGATION BAR            -->
+    <!-- Visível apenas em Telas Pequenas/Celulares -->
+    <!-- ========================================== -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#081810]/95 border-t border-emerald-900/70 backdrop-blur-lg flex justify-around items-center py-2 px-1">
+      
+      <button onclick="navigateTo('dashboard')" id="m-nav-dashboard" class="flex flex-col items-center gap-1 text-[10px] font-semibold text-emerald-400 transition-colors">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+        <span>Campos</span>
+      </button>
+
+      <button onclick="navigateTo('clima')" id="m-nav-clima" class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-white transition-colors">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>
+        <span>Clima</span>
+      </button>
+
+      <!-- Center Floating Button for Inspection on Mobile -->
+      <button onclick="openInspectionModal()" class="flex flex-col items-center -mt-5">
+        <div class="w-11 h-11 rounded-full bg-emerald-500 text-black flex items-center justify-center shadow-lg shadow-emerald-500/30">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+        <span class="text-[9px] text-emerald-400 font-bold mt-0.5">Inspecionar</span>
+      </button>
+
+      <button onclick="navigateTo('soloar')" id="m-nav-soloar" class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-white transition-colors">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+        <span>Solo/Ar</span>
+      </button>
+
+      <button onclick="navigateTo('manejo')" id="m-nav-manejo" class="flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-white transition-colors">
+        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <span>Manejo</span>
+      </button>
+
+    </nav>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. MODAL DE REGISTRO DE INSPEÇÃO DE CAMPO  -->
+  <!-- ========================================== -->
+  <div id="inspectionModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#0b1f14] border border-emerald-800/80 rounded-3xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-emerald-900/60">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
+            📝
+          </div>
+          <div>
+            <h3 class="text-sm font-bold text-white">Registro de Inspeção de Campo</h3>
+            <p class="text-[11px] text-gray-400">Adicione uma nova observação fitossanitária</p>
+          </div>
+        </div>
+        <button onclick="closeInspectionModal()" class="text-gray-400 hover:text-white text-lg font-bold">✕</button>
+      </div>
+
+      <form onsubmit="submitFieldInspection(event)" class="space-y-3.5">
+        
+        <div>
+          <label class="block text-xs font-medium text-emerald-300 mb-1">Talhão Inspecionado</label>
+          <select id="inspTalhao" required class="w-full px-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-xs text-gray-100 focus:outline-none focus:border-emerald-400">
+            <option value="Talhão 01 - Café Arábica">Talhão 01 - Café Arábica (18 ha)</option>
+            <option value="Talhão 02 - Soja Ciclo Médio">Talhão 02 - Soja Ciclo Médio (45 ha)</option>
+            <option value="Talhão 03 - Milho Safrinha">Talhão 03 - Milho Safrinha (22 ha)</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-medium text-emerald-300 mb-1">Ocorrência / Praga</label>
+            <select id="inspPraga" required class="w-full px-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-xs text-gray-100 focus:outline-none focus:border-emerald-400">
+              <option value="Broca-do-café">Broca-do-café</option>
+              <option value="Ferrugem">Ferrugem</option>
+              <option value="Lagarta-do-cartucho">Lagarta-do-cartucho</option>
+              <option value="Bicho-mineiro">Bicho-mineiro</option>
+              <option value="Sem anomalias">Sem anomalias (Saudável)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-emerald-300 mb-1">Nível Observado</label>
+            <select id="inspNivel" required class="w-full px-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-xs text-gray-100 focus:outline-none focus:border-emerald-400">
+              <option value="Baixo (Seguro)">Baixo (Seguro)</option>
+              <option value="Médio (Atenção)">Médio (Atenção)</option>
+              <option value="Crítico (Ação Urgente)">Crítico (Ação Urgente)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-emerald-300 mb-1">Observações do Agrônomo / Produtor</label>
+          <textarea id="inspObs" rows="3" placeholder="Descreva os sintomas, número de armadilhas revisadas ou fotos anexadas..." class="w-full px-3 py-2 bg-[#07160f] border border-emerald-800/80 rounded-xl text-xs text-gray-100 placeholder-gray-500 focus:outline-none focus:border-emerald-400"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button type="button" onclick="closeInspectionModal()" class="px-4 py-2 rounded-xl bg-[#091a11] hover:bg-[#0e271a] text-gray-300 text-xs font-medium transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold shadow-lg shadow-emerald-500/20 transition-all">
+            Salvar Inspeção
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- JAVASCRIPT: LÓGICA DE INTERAÇÃO E ESTADOS  -->
+  <!-- ========================================== -->
+  <script>
+    // State management
+    let currentView = 'dashboard';
+    let tasks = [
+      { id: 1, title: 'Controle de Broca', completed: false, priority: 'Alta' },
+      { id: 2, title: 'Próxima Adubação', completed: false, priority: 'Programada' },
+      { id: 3, title: 'Calibração das Sondas de Solo', completed: true, priority: 'Normal' },
+      { id: 4, title: 'Inspeção Visual de Ferrugem', completed: true, priority: 'Normal' }
+    ];
+
+    // Notification System (Toasts)
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const bgColor = type === 'success' ? 'bg-[#0f2c1c] border-emerald-500 text-emerald-200' 
+                    : (type === 'warn' ? 'bg-[#291f0c] border-amber-500 text-amber-200' 
+                    : 'bg-[#1c2333] border-sky-500 text-sky-200');
+
+      const icon = type === 'success' ? '✓' : (type === 'warn' ? '⚠️' : 'ℹ️');
+
+      toast.className = `${bgColor} border px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-xs transition-all duration-300 pointer-events-auto transform translate-y-2 opacity-0`;
+      toast.innerHTML = `
+        <span class="font-bold text-sm">${icon}</span>
+        <span class="flex-1">${message}</span>
+        <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-white ml-2 text-xs">✕</button>
+      `;
+
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // View Navigation Router
+    function navigateTo(viewName) {
+      currentView = viewName;
+      
+      // Update views visibility
+      const views = ['dashboard', 'clima', 'soloar', 'pragas', 'manejo'];
+      views.forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        if (el) {
+          if (v === viewName) {
+            el.classList.remove('hidden');
+          } else {
+            el.classList.add('hidden');
+          }
+        }
+      });
+
+      // Update Desktop Sidebar items
+      views.forEach(v => {
+        const navEl = document.getElementById(`nav-${v}`);
+        if (navEl) {
+          if (v === viewName) {
+            navEl.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold bg-emerald-500 text-[#05130b] shadow-md shadow-emerald-500/20 transition-all';
+          } else {
+            navEl.className = 'nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium text-gray-300 hover:text-white hover:bg-[#0e271a] transition-all';
+          }
+        }
+      });
+
+      // Update Mobile Navigation items
+      views.forEach(v => {
+        const mNavEl = document.getElementById(`m-nav-${v}`);
+        if (mNavEl) {
+          if (v === viewName) {
+            mNavEl.className = 'flex flex-col items-center gap-1 text-[10px] font-semibold text-emerald-400 transition-colors';
+          } else {
+            mNavEl.className = 'flex flex-col items-center gap-1 text-[10px] font-medium text-gray-400 hover:text-white transition-colors';
+          }
+        }
+      });
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Authentication Flows (Slide 1, 2, 3, 4, 5)
+    function logoutToAuth() {
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('authContainer').classList.remove('hidden');
+      showAuthScreen('landing');
+      showToast('Você saiu do painel da fazenda.', 'info');
+    }
+
+    function showAuthScreen(screen) {
+      const screens = ['Landing', 'Login', 'Register', 'Success'];
+      screens.forEach(s => {
+        const el = document.getElementById(`auth${s}Screen`);
+        if (el) el.classList.add('hidden');
+      });
+
+      const backBtn = document.getElementById('authBackBtn');
+      if (screen === 'landing') {
+        document.getElementById('authLandingScreen').classList.remove('hidden');
+        backBtn.classList.add('hidden');
+      } else if (screen === 'login') {
+        document.getElementById('authLoginScreen').classList.remove('hidden');
+        backBtn.classList.remove('hidden');
+      } else if (screen === 'register') {
+        document.getElementById('authRegisterScreen').classList.remove('hidden');
+        backBtn.classList.remove('hidden');
+      } else if (screen === 'success') {
+        document.getElementById('authSuccessScreen').classList.remove('hidden');
+        backBtn.classList.add('hidden');
+      }
+    }
+
+    function handleLoginSubmit(event) {
+      event.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      
+      // Simulate login
+      document.getElementById('authContainer').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      navigateTo('dashboard');
+      showToast(`Bem-vindo de volta! Sessão iniciada para ${email}`, 'success');
+    }
+
+    function handleRegisterSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('regName').value;
+      const pass = document.getElementById('regPass').value;
+      const passConf = document.getElementById('regPassConfirm').value;
+
+      if (pass !== passConf) {
+        showToast('As senhas digitadas não coincidem!', 'warn');
+        return;
+      }
+
+      showAuthScreen('success');
+      showToast(`Cadastro criado para ${name}!`, 'success');
+    }
+
+    function loginAfterRegistration() {
+      document.getElementById('authContainer').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      navigateTo('dashboard');
+      showToast('Bem-vindo ao Agricultura Inteligente!', 'success');
+    }
+
+    function enterDirectlyAsGuest() {
+      document.getElementById('authContainer').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      navigateTo('dashboard');
+      showToast('Acesso de demonstração ativado.', 'info');
+    }
+
+    // Talhão Change Simulation
+    function changeTalhao(talhaoKey) {
+      showToast(`Filtro atualizado: Exibindo dados de ${talhaoKey.toUpperCase()}`, 'info');
+    }
+
+    // Manejo Tasks Checklist & Progress
+    function toggleTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+      
+      task.completed = !task.completed;
+      
+      const card = document.getElementById(`task-${id}`);
+      const chk = document.getElementById(`task-chk-${id}`);
+      const title = document.getElementById(`task-title-${id}`);
+      const badge = document.getElementById(`task-badge-${id}`);
+
+      if (chk) chk.checked = task.completed;
+
+      if (task.completed) {
+        card.setAttribute('data-status', 'completed');
+        card.classList.add('opacity-85');
+        title.classList.add('line-through', 'text-gray-300');
+        badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800';
+        badge.textContent = 'Concluído';
+        showToast(`Manejo "${task.title}" marcado como concluído!`, 'success');
+      } else {
+        card.setAttribute('data-status', 'pending');
+        card.classList.remove('opacity-85');
+        title.classList.remove('line-through', 'text-gray-300');
+        badge.className = 'text-xs font-semibold px-2.5 py-1 rounded-lg bg-yellow-950/80 text-yellow-300 border border-yellow-700';
+        badge.textContent = 'Pendente';
+        showToast(`Manejo "${task.title}" reaberto como pendente.`, 'info');
+      }
+
+      updateManejoProgress();
+    }
+
+    function updateManejoProgress() {
+      const total = tasks.length;
+      const completed = tasks.filter(t => t.completed).length;
+      const pct = Math.round((completed / total) * 100);
+
+      const textEl = document.getElementById('manejoProgressText');
+      const barEl = document.getElementById('manejoProgressBar');
+      const dashPending = document.getElementById('dashPendingManejo');
+
+      if (textEl) textEl.textContent = `${completed} de ${total} concluídas (${pct}%)`;
+      if (barEl) barEl.style.width = `${pct}%`;
+      if (dashPending) dashPending.textContent = `${total - completed} Pendentes`;
+    }
+
+    function filterManejoTasks(filter) {
+      ['todas', 'pendentes', 'concluidas'].forEach(f => {
+        const btn = document.getElementById(`filter-${f}`);
+        if (btn) {
+          if (f === filter) {
+            btn.className = 'px-3 py-1 rounded-lg bg-emerald-500 text-black font-bold';
+          } else {
+            btn.className = 'px-3 py-1 rounded-lg bg-[#0e271a] text-gray-300 hover:text-white border border-emerald-800/50';
+          }
+        }
+      });
+
+      const cards = document.querySelectorAll('.task-card');
+      cards.forEach(c => {
+        const status = c.getAttribute('data-status');
+        if (filter === 'todas') {
+          c.classList.remove('hidden');
+        } else if (filter === 'pendentes') {
+          c.classList.toggle('hidden', status !== 'pending');
+        } else if (filter === 'concluidas') {
+          c.classList.toggle('hidden', status !== 'completed');
+        }
+      });
+    }
+
+    function addNewManejoTask(event) {
+      event.preventDefault();
+      const input = document.getElementById('newTaskInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const newId = tasks.length + 1;
+      tasks.push({
+        id: newId,
+        title: val,
+        completed: false,
+        priority: 'Normal'
+      });
+
+      const list = document.getElementById('manejoTaskList');
+      const taskDiv = document.createElement('div');
+      taskDiv.className = 'task-card bg-[#0e271a] border border-emerald-800/60 rounded-2xl p-4 transition-all';
+      taskDiv.setAttribute('data-status', 'pending');
+      taskDiv.id = `task-${newId}`;
+      taskDiv.innerHTML = `
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex items-start gap-3">
+            <input type="checkbox" onchange="toggleTask(${newId})" id="task-chk-${newId}" class="w-5 h-5 mt-0.5 rounded-lg text-emerald-500 bg-[#06120b] border-emerald-700 focus:ring-emerald-400 cursor-pointer">
+            <div>
+              <h4 id="task-title-${newId}" class="text-sm font-bold text-white flex items-center gap-2">
+                <span>📋 ${val}</span>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-700">Nova Atividade</span>
+              </h4>
+              <p class="text-xs text-gray-300 mt-1">Registrada manualmente no plano operacional.</p>
+              <div class="flex items-center gap-3 text-[11px] text-emerald-400/90 mt-2">
+                <span>📅 Programada</span>
+                <span>• Talhões Gerais</span>
+              </div>
+            </div>
+          </div>
+          <span id="task-badge-${newId}" class="text-xs font-semibold px-2.5 py-1 rounded-lg bg-yellow-950/80 text-yellow-300 border border-yellow-700">Pendente</span>
+        </div>
+      `;
+
+      list.prepend(taskDiv);
+      input.value = '';
+      updateManejoProgress();
+      showToast('Nova atividade adicionada com sucesso!', 'success');
+    }
+
+    // Field Inspection Modal
+    function openInspectionModal() {
+      document.getElementById('inspectionModal').classList.remove('hidden');
+    }
+
+    function closeInspectionModal() {
+      document.getElementById('inspectionModal').classList.add('hidden');
+    }
+
+    function submitFieldInspection(event) {
+      event.preventDefault();
+      const talhao = document.getElementById('inspTalhao').value;
+      const praga = document.getElementById('inspPraga').value;
+      const nivel = document.getElementById('inspNivel').value;
+      const obs = document.getElementById('inspObs').value || 'Inspeção técnica concluída no quadrante.';
+
+      // Add to recent inspection list
+      const list = document.getElementById('recentInspectionList');
+      if (list) {
+        const item = document.createElement('div');
+        item.className = 'p-2.5 rounded-xl bg-[#143322] border border-emerald-600/70 shadow';
+        item.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-emerald-300">${talhao.split(' - ')[0]} • ${praga}</span>
+            <span class="text-[10px] text-emerald-400 font-mono">Agora</span>
+          </div>
+          <p class="text-[11px] text-gray-200 mt-1">${obs} <span class="text-xs font-semibold text-yellow-300">(${nivel})</span></p>
+        `;
+        list.prepend(item);
+      }
+
+      closeInspectionModal();
+      showToast(`Inspeção de "${praga}" no ${talhao} salva com sucesso!`, 'success');
+      document.getElementById('inspObs').value = '';
+    }
+
+    // Irrigation Simulation Test
+    function simulateIrrigationTest() {
+      showToast('Simulando acionamento da irrigação por gotejamento...', 'info');
+      setTimeout(() => {
+        const depth20 = document.getElementById('depth20Val');
+        const depth20Bar = document.getElementById('depth20Bar');
+        if (depth20 && depth20Bar) {
+          depth20.textContent = '72%';
+          depth20Bar.style.width = '72%';
+        }
+        showToast('Sensores de solo detectaram elevação hídrica para 72% na camada de 20cm.', 'success');
+      }, 1200);
+    }
+
+    // Notifications Dropdown
+    function toggleNotificationDropdown() {
+      const drop = document.getElementById('notifDropdown');
+      drop.classList.toggle('hidden');
+    }
+
+    function clearNotifications() {
+      const badge = document.getElementById('notifBadge');
+      if (badge) badge.classList.add('hidden');
+      showToast('Notificações marcadas como lidas.', 'info');
+      toggleNotificationDropdown();
+    }
+  </script>
+</body>
+</html>
