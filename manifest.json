@@ -1,0 +1,72 @@
+{
+  "id": "/app-agricultura-inteligente/",
+  "name": "Agricultura Inteligente - Plataforma Integrada",
+  "short_name": "AgroSmart",
+  "description": "Monitoramento em tempo real da lavoura: clima, solo, risco de pragas e manejo operacional.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
+  "orientation": "portrait",
+  "background_color": "#050e09",
+  "theme_color": "#050e09",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Clima & Previsão",
+      "short_name": "Clima",
+      "description": "Previsão de chuvas e vento 24h",
+      "url": "./index.html#clima",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Condições de Solo e Ar",
+      "short_name": "Solo & Ar",
+      "description": "Telemetria de sensores de umidade",
+      "url": "./index.html#soloar",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Risco de Pragas",
+      "short_name": "Pragas",
+      "description": "Predição e alertas de ferrugem e broca",
+      "url": "./index.html#pragas",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Sugestões de Manejo",
+      "short_name": "Manejo",
+      "description": "Checklist de tarefas da fazenda",
+      "url": "./index.html#manejo",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

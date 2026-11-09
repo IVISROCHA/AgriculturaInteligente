@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#071b11"/>
+      <stop offset="100%" stop-color="#020704"/>
+    </linearGradient>
+    <linearGradient id="leafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- Background with rounded corners -->
+  <rect width="512" height="512" rx="110" fill="url(#bgGrad)"/>
+  <rect width="504" height="504" x="4" y="4" rx="106" fill="none" stroke="#10b981" stroke-opacity="0.3" stroke-width="6"/>
+  <!-- Glowing circle -->
+  <circle cx="256" cy="256" r="180" fill="url(#glowGrad)"/>
+  <!-- Leaf Icon -->
+  <g transform="translate(106, 106) scale(12.5)">
+    <path fill="url(#leafGrad)" d="M12 2C6.5 2 2 6.5 2 12c0 3.6 1.9 6.8 4.8 8.5L12 22l5.2-1.5C20.1 18.8 22 15.6 22 12c0-5.5-4.5-10-10-10zm-1.5 5.5c2.5 0 5 1.5 6 4.5-.5 3-3 5-6 5.5 1-2.5 1.5-4.5 0-7.5-.5-1-1-1.8-1.5-2.5h1.5z"/>
+  </g>
+</svg>
